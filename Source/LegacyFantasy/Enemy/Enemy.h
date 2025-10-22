@@ -38,19 +38,27 @@ private:
 
 	
 	/* Attack */
-	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	// class UBoxComponent* AttackCollisionBox;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
-	// const UPaperZDAnimSequence* AttackAnimSequence;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	// float StopDistanceToTarget = 70.f;
-	//
-	// FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	// float AttackCooldownInSeconds = 3.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class UBoxComponent* AttackCollisionBox;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	const UPaperZDAnimSequence* AttackAnimSequence;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float StopDistanceToTarget = 70.f;
+
+	struct FTimerHandle AttackCooldownTimer;
+	
+	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float AttackCooldownInSeconds = 3.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanMove = true;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanAttack = true;
 
 	
 	/* Function */
@@ -62,11 +70,18 @@ private:
 	void DetectorOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
-	// UFUNCTION()
-	// void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	// UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
-	//
-	// void Attack();
-	// void OnAttackCooldownTimerTimeout();
-	// void OnAttackOverrideAnimEnd(bool Completed);
+	UFUNCTION()
+	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void EnableAttackCollisionBox(bool Enabled);
+
+	bool ShouldMoveToTarget();
+	
+	void Attack();
+	void OnAttackCooldownTimerTimeout();
+	void OnAttackOverrideAnimEnd(bool Completed);
+
+	void UpdateDirection(float MoveDirection);
 };
