@@ -16,6 +16,12 @@ AEnemy::AEnemy()
 
 	AttackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollisionBox"));
 	AttackCollisionBox->SetupAttachment(RootComponent);
+
+	UpPlatformDetectorBox = CreateDefaultSubobject<UBoxComponent>(TEXT("UpPlatformDetectorBox"));
+	UpPlatformDetectorBox->SetupAttachment(RootComponent);
+
+	DownPlatformDetectorBox = CreateDefaultSubobject<UBoxComponent>(TEXT("DownPlatformDetectorBox"));
+	DownPlatformDetectorBox->SetupAttachment(RootComponent);
 }
 
 void AEnemy::BeginPlay()
@@ -31,6 +37,9 @@ void AEnemy::BeginPlay()
 	EnableAttackCollisionBox(false);
 
 	OnRunOverrideEndDelegate.BindUObject(this, &AEnemy::OnRunOverrideAnimEnd);
+
+	UpPlatformDetectorBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
+	DownPlatformDetectorBox->OnComponentEndOverlap.AddDynamic(this, &AEnemy::OverlapEnd);
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -39,7 +48,7 @@ void AEnemy::Tick(float DeltaTime)
 
 	if (FollowTarget)
 	{
-		float MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
+		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
 		UpdateDirection(MoveDirection);
 
 		if (ShouldMoveToTarget())
@@ -53,20 +62,40 @@ void AEnemy::Tick(float DeltaTime)
 			Attack();
 		}
 	}
+	else
+	{
+		FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+		AddMovementInput(WorldDirection, MoveDirection);
+		UpdateDirection(MoveDirection);
+	}
 }
 
-void AEnemy::UpdateDirection(float MoveDirection)
+void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	MoveDirection = -MoveDirection;
+	UpdateDirection(MoveDirection);
+}
+
+void AEnemy::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int OtherBodyIndex)
+{
+	MoveDirection = -MoveDirection;
+	UpdateDirection(MoveDirection);
+}
+
+void AEnemy::UpdateDirection(float MDirection)
 {
 	FRotator CurrentRotation = GetActorRotation();
 
-	if (MoveDirection < 0.f)
+	if (MDirection < 0.f)
 	{
 		if (CurrentRotation.Yaw != 0.f)
 		{
 			SetActorRotation(FRotator(CurrentRotation.Pitch, 0.f, CurrentRotation.Roll));
 		}
 	}
-	else if (MoveDirection > 0.f)
+	else if (MDirection > 0.f)
 	{
 		if (CurrentRotation.Yaw != 180.f)
 		{

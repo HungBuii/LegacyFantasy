@@ -28,6 +28,22 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	
+	/* Check platform */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class UBoxComponent* UpPlatformDetectorBox;
+
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+    class UBoxComponent* DownPlatformDetectorBox;
+	
+	UFUNCTION()
+	void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex);
+	
 	/* Find Character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	class USphereComponent* CharacterDetectorSphere;
@@ -49,7 +65,10 @@ private:
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
 	/* Direction */
-	void UpdateDirection(float MoveDirection);
+	void UpdateDirection(float MDirection);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	float MoveDirection = 1.f;
 	
 	/* Move */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
