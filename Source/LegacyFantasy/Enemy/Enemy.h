@@ -28,7 +28,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-
 	/* Find Character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	class USphereComponent* CharacterDetectorSphere;
@@ -36,32 +35,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	class ASelectedCharacter* FollowTarget;
 
-	
-	/* Attack */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	class UBoxComponent* AttackCollisionBox;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
-	const UPaperZDAnimSequence* AttackAnimSequence;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	float StopDistanceToTarget = 70.f;
-
-	struct FTimerHandle AttackCooldownTimer;
 	
-	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
+	bool ShouldMoveToTarget();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	float AttackCooldownInSeconds = 3.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool CanMove = true;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool CanAttack = true;
-
-	
-	/* Function */
 	UFUNCTION()
 	void DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
@@ -70,18 +48,47 @@ private:
 	void DetectorOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
+	/* Direction */
+	void UpdateDirection(float MoveDirection);
+	
+	/* Move */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanMove = true;
+
+	/* Run */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	const UPaperZDAnimSequence* RunAnimSequence;
+	
+	FZDOnAnimationOverrideEndSignature OnRunOverrideEndDelegate;
+	
+	void Run();
+	void OnRunOverrideAnimEnd(bool Completed);
+	
+	/* Attack */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class UBoxComponent* AttackCollisionBox;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	const UPaperZDAnimSequence* AttackAnimSequence;
+
+	struct FTimerHandle AttackCooldownTimer;
+	
+	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float AttackCooldownInSeconds = 3.f;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanAttack = true;
+
 	UFUNCTION()
 	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
-
+	
 	UFUNCTION(BlueprintCallable)
 	void EnableAttackCollisionBox(bool Enabled);
-
-	bool ShouldMoveToTarget();
 	
 	void Attack();
 	void OnAttackCooldownTimerTimeout();
 	void OnAttackOverrideAnimEnd(bool Completed);
-
-	void UpdateDirection(float MoveDirection);
 };

@@ -29,6 +29,8 @@ void AEnemy::BeginPlay()
 	
 	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::AttackBoxOverlapBegin);
 	EnableAttackCollisionBox(false);
+
+	OnRunOverrideEndDelegate.BindUObject(this, &AEnemy::OnRunOverrideAnimEnd);
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -44,6 +46,7 @@ void AEnemy::Tick(float DeltaTime)
 		{
 			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
 			AddMovementInput(WorldDirection, MoveDirection);
+			Run();
 		}
 		else
 		{
@@ -70,6 +73,17 @@ void AEnemy::UpdateDirection(float MoveDirection)
 			SetActorRotation(FRotator(CurrentRotation.Pitch, 180.f, CurrentRotation.Roll));
 		}
 	}
+}
+
+void AEnemy::Run()
+{
+	GetAnimInstance()->PlayAnimationOverride(RunAnimSequence, FName("RunSlot"), 1.f,
+			0.f, OnRunOverrideEndDelegate);
+}
+
+void AEnemy::OnRunOverrideAnimEnd(bool Completed)
+{
+	
 }
 
 bool AEnemy::ShouldMoveToTarget()
@@ -104,49 +118,56 @@ void AEnemy::DetectorOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 	}
 }
 
-// void AEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-// 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
-// {
-// 	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
-// 	
-// 	if (Character)
-// 	{
-// 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, TEXT("Character is attacked!"));
-// 	}
-// }
-//
-// void AEnemy::Attack()
-// {
-// 	CanMove = false;
-// 	CanAttack = false;
-// 	
-// 	GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
-// 			0.f, OnAttackOverrideEndDelegate);
-//
-// 	GetWorldTimerManager().SetTimer(AttackCooldownTimer, this, &AEnemy::OnAttackCooldownTimerTimeout,
-// 			1.f, false, AttackCooldownInSeconds);
-// }
-//
-// void AEnemy::OnAttackCooldownTimerTimeout()
-// {
-// 	CanAttack = true;
-// }
-//
-// void AEnemy::OnAttackOverrideAnimEnd(bool Completed)
-// {
-// 	CanMove = true;
-// }
-//
-// void AEnemy::EnableAttackCollisionBox(bool Enabled)
-// {
-// 	if (Enabled)
-// 	{
-// 		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-// 		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-// 	}
-// 	else
-// 	{
-// 		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-// 		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-// 	}
-// }
+void AEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
+	
+	if (Character)
+	{
+		// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, TEXT("Character is attacked!"));
+	}
+}
+
+void AEnemy::Attack()
+{
+	if (CanAttack)
+	{
+		CanMove = false;
+		CanAttack = false;
+	
+		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
+				0.f, OnAttackOverrideEndDelegate);
+	
+		// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, TEXT("Enemy Attack!"));
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Attack!"));
+	
+		GetWorldTimerManager().SetTimer(AttackCooldownTimer, this, &AEnemy::OnAttackCooldownTimerTimeout,
+				1.f, false, AttackCooldownInSeconds);
+	}
+	
+}
+
+void AEnemy::OnAttackCooldownTimerTimeout()
+{
+	CanAttack = true;
+}
+
+void AEnemy::OnAttackOverrideAnimEnd(bool Completed)
+{
+	CanMove = true;
+}
+
+void AEnemy::EnableAttackCollisionBox(bool Enabled)
+{
+	if (Enabled)
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	}
+	else
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+}
