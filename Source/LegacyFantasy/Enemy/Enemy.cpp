@@ -46,7 +46,7 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (FollowTarget)
+	if (FollowTarget && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
 	{
 		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
 		UpdateDirection(MoveDirection);
@@ -64,24 +64,23 @@ void AEnemy::Tick(float DeltaTime)
 	}
 	else
 	{
-		FVector WorldDirection = FVector(1.f, 0.f, 0.f);
-		AddMovementInput(WorldDirection, MoveDirection);
-		UpdateDirection(MoveDirection);
+		if (CanWalk)
+		{
+			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+			AddMovementInput(WorldDirection, MoveDirection);
+			UpdateDirection(MoveDirection);
+		}
 	}
 }
 
-void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+bool AEnemy::ShouldMoveToTarget()
 {
-	MoveDirection = -MoveDirection;
-	UpdateDirection(MoveDirection);
-}
-
-void AEnemy::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int OtherBodyIndex)
-{
-	MoveDirection = -MoveDirection;
-	UpdateDirection(MoveDirection);
+	if (FollowTarget)
+	{
+		float DistToTarget = abs(FollowTarget->GetActorLocation().X - GetActorLocation().X);
+		return (DistToTarget > StopDistanceToTarget);
+	}
+	return false;
 }
 
 void AEnemy::UpdateDirection(float MDirection)
@@ -104,25 +103,34 @@ void AEnemy::UpdateDirection(float MDirection)
 	}
 }
 
+void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	MoveDirection = -MoveDirection;
+	UpdateDirection(MoveDirection);
+}
+
+void AEnemy::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int OtherBodyIndex)
+{
+	MoveDirection = -MoveDirection;
+	UpdateDirection(MoveDirection);
+}
+
 void AEnemy::Run()
 {
-	GetAnimInstance()->PlayAnimationOverride(RunAnimSequence, FName("RunSlot"), 1.f,
-			0.f, OnRunOverrideEndDelegate);
+	if (CanRun)
+	{
+		CanRun = false;
+		
+		GetAnimInstance()->PlayAnimationOverride(RunAnimSequence, FName("RunSlot"), 1.f,
+		                                         0.f, OnRunOverrideEndDelegate);
+	}
 }
 
 void AEnemy::OnRunOverrideAnimEnd(bool Completed)
 {
-	
-}
-
-bool AEnemy::ShouldMoveToTarget()
-{
-	if (FollowTarget)
-	{
-		float DistToTarget = abs(FollowTarget->GetActorLocation().X - GetActorLocation().X);
-		return (DistToTarget > StopDistanceToTarget);
-	}
-	return false;
+	CanRun = true;
 }
 
 void AEnemy::DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -162,7 +170,7 @@ void AEnemy::Attack()
 {
 	if (CanAttack)
 	{
-		CanMove = false;
+		CanWalk = false;
 		CanAttack = false;
 	
 		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
@@ -184,7 +192,7 @@ void AEnemy::OnAttackCooldownTimerTimeout()
 
 void AEnemy::OnAttackOverrideAnimEnd(bool Completed)
 {
-	CanMove = true;
+	CanWalk = true;
 }
 
 void AEnemy::EnableAttackCollisionBox(bool Enabled)

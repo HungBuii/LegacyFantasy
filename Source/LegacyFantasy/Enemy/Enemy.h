@@ -72,13 +72,16 @@ private:
 	
 	/* Move */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool CanMove = true;
+	bool CanWalk = true;
 
 	/* Run */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	const UPaperZDAnimSequence* RunAnimSequence;
 	
 	FZDOnAnimationOverrideEndSignature OnRunOverrideEndDelegate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanRun = true;
 	
 	void Run();
 	void OnRunOverrideAnimEnd(bool Completed);
