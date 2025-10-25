@@ -45,7 +45,11 @@ void AEnemy::BeginPlay()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+}
 
+void AEnemy::EnemyAction()
+{
 	if (FollowTarget && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
 	{
 		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
@@ -71,6 +75,8 @@ void AEnemy::Tick(float DeltaTime)
 			UpdateDirection(MoveDirection);
 		}
 	}
+
+	EnemyActionDelegate.Broadcast();
 }
 
 bool AEnemy::ShouldMoveToTarget()

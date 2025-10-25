@@ -7,9 +7,8 @@
 #include "PaperZDAnimInstance.h"
 #include "Enemy.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEnemyActionDelegate);
+
 UCLASS()
 class LEGACYFANTASY_API AEnemy : public APaperZDCharacter
 {
@@ -113,4 +112,11 @@ private:
 	void Attack();
 	void OnAttackCooldownTimerTimeout();
 	void OnAttackOverrideAnimEnd(bool Completed);
+
+	/* Event, function callback */
+	UPROPERTY(BlueprintAssignable)
+	FEnemyActionDelegate EnemyActionDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void EnemyAction();
 };
