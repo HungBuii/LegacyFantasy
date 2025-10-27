@@ -54,6 +54,9 @@ private:
     class UInputAction* AttackAction;
 	
 	/* Move */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanMove = true;
+	
 	void Move(const FInputActionValue& Value);
 
 	/* Jump */

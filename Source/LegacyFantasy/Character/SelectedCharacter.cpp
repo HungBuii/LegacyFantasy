@@ -72,9 +72,13 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 {
 	float MoveActionValue = Value.Get<float>();
 
-	FVector WorldDirection = FVector(1.f, 0, 0);
-	AddMovementInput(WorldDirection, MoveActionValue);
-	UpdateDirection(MoveActionValue);
+	if (CanMove)
+	{
+		FVector WorldDirection = FVector(1.f, 0, 0);
+		AddMovementInput(WorldDirection, MoveActionValue);
+		UpdateDirection(MoveActionValue);
+	}
+	
 }
 
 void ASelectedCharacter::JumpStarted(const FInputActionValue& Value)
@@ -92,6 +96,7 @@ void ASelectedCharacter::Attack(const FInputActionValue& Value)
 	if (CanAttack)
 	{
 		CanAttack = false;
+		CanMove = false;
 		
 		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
 				0.f, OnAttackOverrideEndDelegate);
@@ -101,6 +106,7 @@ void ASelectedCharacter::Attack(const FInputActionValue& Value)
 void ASelectedCharacter::OnAttackOverrideAnimEnd(bool Completed)
 {
 	CanAttack = true;
+	CanMove = true;
 }
 
 void ASelectedCharacter::EnableAttackCollisionBox(bool Enabled)
