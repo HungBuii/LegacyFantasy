@@ -68,6 +68,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	float MoveDirection = 1.f;
+
+	/* Movement */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class UCharacterMovementComponent* EnemyMovement;
 	
 	/* Move */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))

@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "LegacyFantasy/Character/SelectedCharacter.h"
 
 AEnemy::AEnemy()
@@ -28,6 +29,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	EnemyMovement = GetCharacterMovement();
+	
 	CharacterDetectorSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::DetectorOverlapBegin);
 	CharacterDetectorSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemy::DetectorOverlapEnd);
 
@@ -59,6 +62,7 @@ void AEnemy::EnemyAction()
 		{
 			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
 			AddMovementInput(WorldDirection, MoveDirection);
+			EnemyMovement->MaxWalkSpeed = 300.f;
 			Run();
 		}
 		else
@@ -72,6 +76,7 @@ void AEnemy::EnemyAction()
 		{
 			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
 			AddMovementInput(WorldDirection, MoveDirection);
+			EnemyMovement->MaxWalkSpeed = 100.f;
 			UpdateDirection(MoveDirection);
 		}
 	}
