@@ -50,6 +50,9 @@ void ASelectedCharacter::BeginPlay()
 void ASelectedCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.2f seconds"), RealTime);
+	// RealTime += DeltaTime;
 }
 
 void ASelectedCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -81,6 +84,26 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 	
 }
 
+void ASelectedCharacter::UpdateDirection(float MoveDirection)
+{
+	FRotator CurrentRotation = Controller->GetControlRotation();
+
+	if (MoveDirection < 0.f)
+	{
+		if (CurrentRotation.Yaw != 180.f)
+		{
+			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 180.f, CurrentRotation.Roll));
+		}
+	}
+	else if (MoveDirection > 0.f)
+	{
+		if (CurrentRotation.Yaw != 0.f)
+		{
+			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 0.f, CurrentRotation.Roll));
+		}
+	}
+}
+
 void ASelectedCharacter::JumpStarted(const FInputActionValue& Value)
 {
 	Jump();
@@ -100,12 +123,19 @@ void ASelectedCharacter::Attack(const FInputActionValue& Value)
 		
 		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
 				0.f, OnAttackOverrideEndDelegate);
+
+		GetWorldTimerManager().SetTimer(AttackCooldownTimer, this,
+			&ASelectedCharacter::OnAttackCooldownTimerTimeout, 1.f, false, AttackCooldownInSeconds);
 	}
+}
+
+void ASelectedCharacter::OnAttackCooldownTimerTimeout()
+{
+	CanAttack = true;
 }
 
 void ASelectedCharacter::OnAttackOverrideAnimEnd(bool Completed)
 {
-	CanAttack = true;
 	CanMove = true;
 }
 
@@ -131,26 +161,6 @@ void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedCo
 	if (Enemy)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, Enemy->GetName());
-	}
-}
-
-void ASelectedCharacter::UpdateDirection(float MoveDirection)
-{
-	FRotator CurrentRotation = Controller->GetControlRotation();
-
-	if (MoveDirection < 0.f)
-	{
-		if (CurrentRotation.Yaw != 180.f)
-		{
-			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 180.f, CurrentRotation.Roll));
-		}
-	}
-	else if (MoveDirection > 0.f)
-	{
-		if (CurrentRotation.Yaw != 0.f)
-		{
-			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 0.f, CurrentRotation.Roll));
-		}
 	}
 }
 

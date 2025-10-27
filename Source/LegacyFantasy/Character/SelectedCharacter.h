@@ -32,6 +32,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	/* Realtime */
+	// float RealTime = 0.f;
 	
 	/* Camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
@@ -69,7 +71,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	const UPaperZDAnimSequence* AttackAnimSequence;
-
+	
 	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
@@ -85,6 +87,13 @@ private:
 	UFUNCTION()
 	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float AttackCooldownInSeconds = 3.f;
+	
+	struct FTimerHandle AttackCooldownTimer;
+
+	void OnAttackCooldownTimerTimeout();
 	
 	/* Direction */
 	void UpdateDirection(float MoveDirection);
