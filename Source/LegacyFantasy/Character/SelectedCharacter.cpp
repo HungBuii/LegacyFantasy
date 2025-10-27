@@ -7,6 +7,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/BoxComponent.h"
+#include "LegacyFantasy/Enemy/Enemy.h"
 
 
 ASelectedCharacter::ASelectedCharacter()
@@ -18,6 +20,9 @@ ASelectedCharacter::ASelectedCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
+	AttackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollisionBox"));
+	AttackCollisionBox->SetupAttachment(RootComponent);
 }
 
 void ASelectedCharacter::BeginPlay()
@@ -35,6 +40,11 @@ void ASelectedCharacter::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
+	OnAttackOverrideEndDelegate.BindUObject(this, &ASelectedCharacter::OnAttackOverrideAnimEnd);
+
+	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ASelectedCharacter::AttackBoxOverlapBegin);
+	EnableAttackCollisionBox(false);
 }
 
 void ASelectedCharacter::Tick(float DeltaTime)
@@ -53,6 +63,8 @@ void ASelectedCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ASelectedCharacter::JumpStarted);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ASelectedCharacter::JumpEnded);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Canceled, this, &ASelectedCharacter::JumpEnded);
+
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ASelectedCharacter::Attack);
 	}
 }
 
@@ -73,6 +85,47 @@ void ASelectedCharacter::JumpStarted(const FInputActionValue& Value)
 void ASelectedCharacter::JumpEnded(const FInputActionValue& Value)
 {
 	StopJumping();
+}
+
+void ASelectedCharacter::Attack(const FInputActionValue& Value)
+{
+	if (CanAttack)
+	{
+		CanAttack = false;
+		
+		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
+				0.f, OnAttackOverrideEndDelegate);
+	}
+}
+
+void ASelectedCharacter::OnAttackOverrideAnimEnd(bool Completed)
+{
+	CanAttack = true;
+}
+
+void ASelectedCharacter::EnableAttackCollisionBox(bool Enabled)
+{
+	if (Enabled)
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	}
+	else
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+}
+
+void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                               UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
+
+	if (Enemy)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, Enemy->GetName());
+	}
 }
 
 void ASelectedCharacter::UpdateDirection(float MoveDirection)

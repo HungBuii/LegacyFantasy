@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PaperZDAnimInstance.h"
 #include "PaperZDCharacter.h"
 #include "SelectedCharacter.generated.h"
 
@@ -48,11 +49,40 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	class UInputAction* JumpAction;
-
-	/* Function */
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+    class UInputAction* AttackAction;
+	
+	/* Move */
 	void Move(const FInputActionValue& Value);
+
+	/* Jump */
 	void JumpStarted(const FInputActionValue& Value);
 	void JumpEnded(const FInputActionValue& Value);
+	
+	/* Attack */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class UBoxComponent* AttackCollisionBox;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	const UPaperZDAnimSequence* AttackAnimSequence;
+
+	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	bool CanAttack = true;
+	
+	void Attack(const FInputActionValue& Value);
+
+	void OnAttackOverrideAnimEnd(bool Completed);
+
+	UFUNCTION(BlueprintCallable)
+	void EnableAttackCollisionBox(bool Enabled);
+
+	UFUNCTION()
+	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
+	
+	/* Direction */
 	void UpdateDirection(float MoveDirection);
 };
