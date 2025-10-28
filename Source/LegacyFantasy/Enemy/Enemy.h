@@ -117,6 +117,28 @@ private:
 	void OnAttackCooldownTimerTimeout();
 	void OnAttackOverrideAnimEnd(bool Completed);
 
+public:
+	/* Take damage */
+	void TakeDamage(int DamageAmount);
+
+private:
+	/* HP */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int HP = 100;
+
+	void SetHP(int NewHP);
+	
+public:
+	int GetHP();
+
+private:
+
+	/* Status */
+	float IsAlive = true;
+	
+	/* Die */
+	void Die();
+	
 	/* Event, function callback */
 	UPROPERTY(BlueprintAssignable)
 	FEnemyActionDelegate EnemyActionDelegate;

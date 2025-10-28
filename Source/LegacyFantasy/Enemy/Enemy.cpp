@@ -53,34 +53,37 @@ void AEnemy::Tick(float DeltaTime)
 
 void AEnemy::EnemyAction()
 {
-	if (FollowTarget && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
+	if (IsAlive)
 	{
-		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
-		UpdateDirection(MoveDirection);
-
-		if (ShouldMoveToTarget())
+		if (FollowTarget && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
 		{
-			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
-			AddMovementInput(WorldDirection, MoveDirection);
-			EnemyMovement->MaxWalkSpeed = 300.f;
-			Run();
+			MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
+			UpdateDirection(MoveDirection);
+
+			if (ShouldMoveToTarget())
+			{
+				FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+				AddMovementInput(WorldDirection, MoveDirection);
+				EnemyMovement->MaxWalkSpeed = 300.f;
+				Run();
+			}
+			else
+			{
+				Attack();
+			}
 		}
 		else
 		{
-			Attack();
+			if (CanWalk)
+			{
+				FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+				AddMovementInput(WorldDirection, MoveDirection);
+				EnemyMovement->MaxWalkSpeed = 100.f;
+				UpdateDirection(MoveDirection);
+			}
 		}
 	}
-	else
-	{
-		if (CanWalk)
-		{
-			FVector WorldDirection = FVector(1.f, 0.f, 0.f);
-			AddMovementInput(WorldDirection, MoveDirection);
-			EnemyMovement->MaxWalkSpeed = 100.f;
-			UpdateDirection(MoveDirection);
-		}
-	}
-
+	
 	EnemyActionDelegate.Broadcast();
 }
 
@@ -149,7 +152,7 @@ void AEnemy::DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
 
-	if (Character)
+	if (Character && IsAlive)
 	{
 		FollowTarget = Character;
 	}
@@ -218,4 +221,44 @@ void AEnemy::EnableAttackCollisionBox(bool Enabled)
 		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	}
+}
+
+void AEnemy::TakeDamage(int DamageAmount)
+{
+	if (!IsAlive) return;
+	
+	HP -= DamageAmount;
+
+	if (HP <= 0)
+	{
+		Die();
+		SetHP(0);
+	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
+}
+
+void AEnemy::SetHP(int NewHP)
+{
+	HP = NewHP;
+}
+
+int AEnemy::GetHP()
+{
+	return HP;
+}
+
+void AEnemy::Die()
+{
+	IsAlive = false;
+	CanWalk = false;
+	CanRun = false;
+	CanAttack = false;
+
+	FollowTarget = NULL;
+		
+	// Play the die animation
+	GetAnimInstance()->JumpToNode(FName("JumpDie"), FName("Brown Boar State Machine"));
+		
+	EnableAttackCollisionBox(false);
 }

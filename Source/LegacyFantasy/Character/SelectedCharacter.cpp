@@ -160,7 +160,7 @@ void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedCo
 
 	if (Enemy)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, Enemy->GetName());
+		Enemy->TakeDamage(DamageAmount);
 	}
 }
 

@@ -94,6 +94,9 @@ private:
 	struct FTimerHandle AttackCooldownTimer;
 
 	void OnAttackCooldownTimerTimeout();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int DamageAmount = 25;
 	
 	/* Direction */
 	void UpdateDirection(float MoveDirection);
