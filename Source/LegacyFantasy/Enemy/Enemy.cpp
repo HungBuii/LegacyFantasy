@@ -55,7 +55,7 @@ void AEnemy::EnemyAction()
 {
 	if (IsAlive)
 	{
-		if (FollowTarget && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
+		if (FollowTarget && FollowTarget->GetStatusCharacter() && FMath::FloorToInt(FollowTarget->GetActorLocation().Z) == FMath::FloorToInt(GetActorLocation().Z))
 		{
 			MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
 			UpdateDirection(MoveDirection);
@@ -152,7 +152,7 @@ void AEnemy::DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
 
-	if (Character && IsAlive)
+	if (Character && IsAlive && Character->GetStatusCharacter())
 	{
 		FollowTarget = Character;
 	}
@@ -174,9 +174,9 @@ void AEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
 	
-	if (Character)
+	if (Character && Character->GetStatusCharacter())
 	{
-		// GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::White, TEXT("Character is attacked!"));
+		Character->TakeDamage(DamageAttack);
 	}
 }
 
@@ -232,7 +232,6 @@ void AEnemy::TakeDamage(int DamageAmount)
 	if (HP <= 0)
 	{
 		Die();
-		SetHP(0);
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
@@ -250,6 +249,8 @@ int AEnemy::GetHP()
 
 void AEnemy::Die()
 {
+	SetHP(0);
+	
 	IsAlive = false;
 	CanWalk = false;
 	CanRun = false;

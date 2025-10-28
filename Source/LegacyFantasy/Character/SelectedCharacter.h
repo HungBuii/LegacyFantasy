@@ -96,8 +96,34 @@ private:
 	void OnAttackCooldownTimerTimeout();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int DamageAmount = 25;
+	int DamageAttack = 25;
 	
 	/* Direction */
 	void UpdateDirection(float MoveDirection);
+
+public:
+	/* Take damage */
+	void TakeDamage(int DamageAmount);
+
+private:
+	/* HP */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int HP = 100;
+
+	void SetHP(int NewHP);
+
+public:
+	int GetHP();
+
+private:
+	/* Status */
+	bool IsAlive = true;
+	
+public:
+	bool GetStatusCharacter();	
+
+private:
+	/* Die */
+	void Die();
+	
 };

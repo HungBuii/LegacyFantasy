@@ -106,6 +106,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	bool CanAttack = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int DamageAttack = 20;
+
 	UFUNCTION()
 	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
@@ -134,7 +137,7 @@ public:
 private:
 
 	/* Status */
-	float IsAlive = true;
+	bool IsAlive = true;
 	
 	/* Die */
 	void Die();

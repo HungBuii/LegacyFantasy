@@ -160,8 +160,49 @@ void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedCo
 
 	if (Enemy)
 	{
-		Enemy->TakeDamage(DamageAmount);
+		Enemy->TakeDamage(DamageAttack);
 	}
 }
 
+void ASelectedCharacter::TakeDamage(int DamageAmount)
+{
+	if (!IsAlive) return;
+
+	HP -= DamageAmount;
+	if (HP <= 0)
+	{
+		Die();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Character HP: %d"), HP);
+}
+
+void ASelectedCharacter::SetHP(int NewHP)
+{
+	HP = NewHP;
+}
+
+int ASelectedCharacter::GetHP()
+{
+	return HP;
+}
+
+void ASelectedCharacter::Die()
+{
+	SetHP(0);
+	
+	IsAlive = false;
+	CanMove = false;
+	CanAttack = false;
+
+	// Play the die animation
+	GetAnimInstance()->JumpToNode(FName("JumpDie"), FName("Character State Machine"));
+
+	EnableAttackCollisionBox(false);
+}
+
+bool ASelectedCharacter::GetStatusCharacter()
+{
+	return IsAlive;
+}
 
