@@ -75,7 +75,7 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 {
 	float MoveActionValue = Value.Get<float>();
 
-	if (CanMove)
+	if (CanMove && IsAlive)
 	{
 		FVector WorldDirection = FVector(1.f, 0, 0);
 		AddMovementInput(WorldDirection, MoveActionValue);
@@ -116,7 +116,7 @@ void ASelectedCharacter::JumpEnded(const FInputActionValue& Value)
 
 void ASelectedCharacter::Attack(const FInputActionValue& Value)
 {
-	if (CanAttack)
+	if (CanAttack && IsAlive)
 	{
 		CanAttack = false;
 		CanMove = false;
