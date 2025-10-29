@@ -122,11 +122,11 @@ private:
 
 public:
 	/* Take damage */
-	void TakeDamage(int DamageAmount);
+	virtual void TakeDamage(int DamageAmount) override;
 
 	/* HP */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int HP = 100;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	// int HP = 100;
 
 	void SetHP(int NewHP);
 	

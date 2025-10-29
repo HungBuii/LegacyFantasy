@@ -120,13 +120,14 @@ private:
 	// void OnAttackCooldownTimerTimeout();
 	// void OnAttackOverrideAnimEnd(bool Completed);
 
-// public:
-// 	/* Take damage */
-// 	virtual void TakeDamage(int DamageAmount);
-	
+public:
+	/* Take damage */
+	virtual void TakeDamage(int DamageAmount);
+
+protected:
 	/* HP */
-// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-// 	int HP = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int HP = 100;
 //
 // 	void SetHP(int NewHP);
 // 	

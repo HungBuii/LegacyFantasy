@@ -218,19 +218,19 @@ void AEnemy::Tick(float DeltaTime)
 // 	}
 // }
 
-// void AEnemy::TakeDamage(int DamageAmount)
-// {
-// 	if (!IsAlive) return;
-// 	
-// 	HP -= DamageAmount;
-// 	
-// 	if (HP <= 0)
-// 	{
-// 		Die();
-// 	}
-// 	
-// 	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
-// }
+void AEnemy::TakeDamage(int DamageAmount)
+{
+	// if (!IsAlive) return;
+	//
+	// HP -= DamageAmount;
+	//
+	// if (HP <= 0)
+	// {
+	// 	Die();
+	// }
+	//
+	// UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
+}
 
 // void AEnemy::SetHP(int NewHP)
 // {
