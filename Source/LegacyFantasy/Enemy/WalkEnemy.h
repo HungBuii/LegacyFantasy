@@ -123,7 +123,17 @@ private:
 public:
 	/* Take damage */
 	void TakeDamage(int DamageAmount);
+
+	/* HP */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int HP = 100;
+
+	void SetHP(int NewHP);
 	
+public:
+	int GetHP();
+
+private:
 	/* Status */
 	bool IsAlive = true;
 	

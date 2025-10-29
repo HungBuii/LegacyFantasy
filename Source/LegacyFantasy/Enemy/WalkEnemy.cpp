@@ -237,6 +237,16 @@ void AWalkEnemy::TakeDamage(int DamageAmount)
 	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
 }
 
+void AWalkEnemy::SetHP(int NewHP)
+{
+	HP = NewHP;
+}
+
+int AWalkEnemy::GetHP()
+{
+	return HP;
+}
+
 void AWalkEnemy::Die()
 {
 	SetHP(0);

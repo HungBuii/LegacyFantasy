@@ -123,16 +123,15 @@ private:
 // public:
 // 	/* Take damage */
 // 	virtual void TakeDamage(int DamageAmount);
-
-protected:
-	/* HP */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int HP = 100;
-
-	void SetHP(int NewHP);
 	
-public:
-	int GetHP();
+	/* HP */
+// 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+// 	int HP = 100;
+//
+// 	void SetHP(int NewHP);
+// 	
+// public:
+// 	int GetHP();
 
 private:
 

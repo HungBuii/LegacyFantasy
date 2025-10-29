@@ -232,15 +232,15 @@ void AEnemy::Tick(float DeltaTime)
 // 	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
 // }
 
-void AEnemy::SetHP(int NewHP)
-{
-	HP = NewHP;
-}
+// void AEnemy::SetHP(int NewHP)
+// {
+// 	HP = NewHP;
+// }
 
-int AEnemy::GetHP()
-{
-	return HP;
-}
+// int AEnemy::GetHP()
+// {
+// 	return HP;
+// }
 
 // void AEnemy::Die()
 // {
