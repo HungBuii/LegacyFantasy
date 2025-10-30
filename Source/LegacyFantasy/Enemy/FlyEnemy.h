@@ -116,4 +116,7 @@ public:
 private:
 	/* Status */
 	bool IsAlive = true;
+
+	/* Die */
+	void Die();
 };

@@ -141,7 +141,7 @@ void AFlyEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	
 	if (Character && Character->GetStatusCharacter())
 	{
-		Character->TakeDamage(DamageAttack);
+		// Character->TakeDamage(DamageAttack);
 	}
 }
 
@@ -192,10 +192,14 @@ void AFlyEnemy::TakeDamage(int DamageAmount)
 	
 	HP -= DamageAmount;
 
-	// if (HP <= 0)
-	// {
-	// 	Die();
-	// }
+	if (HP <= 0)
+	{
+		Die();
+	}
+	else
+	{
+		GetAnimInstance()->JumpToNode(FName("JumpTakeHit"), FName("Bee State Machine"));
+	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("Bee HP: %d"), HP);
 }
@@ -208,4 +212,17 @@ void AFlyEnemy::SetHP(int NewHP)
 int AFlyEnemy::GetHP()
 {
 	return Super::GetHP();
+}
+
+void AFlyEnemy::Die()
+{
+	SetHP(0);
+	
+	IsAlive = false;
+	CanMove = false;
+	CanAttack = false;
+
+	FollowTarget = NULL;
+		
+	EnableAttackCollisionBox(false);
 }
