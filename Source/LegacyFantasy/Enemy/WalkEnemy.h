@@ -67,7 +67,7 @@ private:
 	void UpdateDirection(float MDirection);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
-	float MoveDirection = 1.f;
+	float MoveDirection = -1.f;
 	
 	/* Movement */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
