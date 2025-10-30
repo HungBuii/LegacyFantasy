@@ -35,7 +35,6 @@ void AWalkEnemy::BeginPlay()
 	CharacterDetectorSphere->OnComponentEndOverlap.AddDynamic(this, &AWalkEnemy::DetectorOverlapEnd);
 
 	OnAttackOverrideEndDelegate.BindUObject(this, &AWalkEnemy::OnAttackOverrideAnimEnd);
-	
 	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AWalkEnemy::AttackBoxOverlapBegin);
 	EnableAttackCollisionBox(false);
 
@@ -191,7 +190,7 @@ void AWalkEnemy::Attack()
 				0.f, OnAttackOverrideEndDelegate);
 	
 		// GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, TEXT("Enemy Attack!"));
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Attack!"));
+		UE_LOG(LogTemp, Warning, TEXT("Boar Attack!"));
 	
 		GetWorldTimerManager().SetTimer(AttackCooldownTimer, this, &AWalkEnemy::OnAttackCooldownTimerTimeout,
 				1.f, false, AttackCooldownInSeconds);
@@ -234,17 +233,17 @@ void AWalkEnemy::TakeDamage(int DamageAmount)
 		Die();
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("Enemy HP: %d"), HP);
+	UE_LOG(LogTemp, Warning, TEXT("Boar HP: %d"), HP);
 }
 
 void AWalkEnemy::SetHP(int NewHP)
 {
-	HP = NewHP;
+	Super::SetHP(NewHP);
 }
 
 int AWalkEnemy::GetHP()
 {
-	return HP;
+	return Super::GetHP();
 }
 
 void AWalkEnemy::Die()

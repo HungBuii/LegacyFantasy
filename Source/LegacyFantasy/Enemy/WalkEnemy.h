@@ -128,10 +128,11 @@ public:
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	// int HP = 100;
 
-	void SetHP(int NewHP);
+protected:
+	void SetHP(int NewHP) override;
 	
 public:
-	int GetHP();
+	int GetHP() override;
 
 private:
 	/* Status */

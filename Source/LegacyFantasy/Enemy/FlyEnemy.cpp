@@ -5,7 +5,6 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "LegacyFantasy/Character/SelectedCharacter.h"
 
 AFlyEnemy::AFlyEnemy()
@@ -15,6 +14,9 @@ AFlyEnemy::AFlyEnemy()
 	
 	PlatformDetectorBox = CreateDefaultSubobject<UBoxComponent>(TEXT("PlatformDetectorBox"));
 	PlatformDetectorBox->SetupAttachment(RootComponent);
+
+	AttackCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollisionBox"));
+	AttackCollisionBox->SetupAttachment(RootComponent);
 }
 
 void AFlyEnemy::BeginPlay()
@@ -27,13 +29,17 @@ void AFlyEnemy::BeginPlay()
 	CharacterDetectorSphere->OnComponentEndOverlap.AddDynamic(this, &AFlyEnemy::DetectorOverlapEnd);
 	
 	PlatformDetectorBox->OnComponentBeginOverlap.AddDynamic(this, &AFlyEnemy::PlatformDetectorOverlapBegin);
+
+	OnAttackOverrideEndDelegate.BindUObject(this, &AFlyEnemy::OnAttackOverrideAnimEnd);
+	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AFlyEnemy::AttackBoxOverlapBegin);
+	EnableAttackCollisionBox(false);
 }
 
 void AFlyEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (FollowTarget)
+	if (FollowTarget && FollowTarget->GetStatusCharacter())
 	{
 		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
 		UpdateDirection(MoveDirection);
@@ -48,20 +54,23 @@ void AFlyEnemy::Tick(float DeltaTime)
 		else
 		{
 			// Attack
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Attack"));
+			Attack();
 		}
 	}
 	else
 	{
-		// FVector WorldDirection = FVector(1.f, 0.f, 0.f);
-		// AddMovementInput(WorldDirection, MoveDirection);
-		// EnemyMovement->MaxFlySpeed = MoveSpeed;
-		// UpdateDirection(MoveDirection);
+		if (CanMove)
+		{
+			// FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+			// AddMovementInput(WorldDirection, MoveDirection);
+			// EnemyMovement->MaxFlySpeed = MoveSpeed;
+			// UpdateDirection(MoveDirection);
 
-		UpdateDirection(MoveDirection);
-		FVector NewLocation = GetActorLocation();
-		NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * DeltaTime);
-		SetActorLocation(NewLocation);
+			UpdateDirection(MoveDirection);
+			FVector NewLocation = GetActorLocation();
+			NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * DeltaTime);
+			SetActorLocation(NewLocation);
+		}
 	}
 	
 }
@@ -104,7 +113,7 @@ void AFlyEnemy::UpdateDirection(float MDirection)
 }
 
 void AFlyEnemy::DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+                                     UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
 {
 	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
 
@@ -123,4 +132,80 @@ void AFlyEnemy::DetectorOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		FollowTarget = NULL;
 	}
+}
+
+void AFlyEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
+{
+	ASelectedCharacter* Character = Cast<ASelectedCharacter>(OtherActor);
+	
+	if (Character && Character->GetStatusCharacter())
+	{
+		Character->TakeDamage(DamageAttack);
+	}
+}
+
+void AFlyEnemy::Attack()
+{
+	if (CanAttack)
+	{
+		CanMove = false;
+		CanAttack = false;
+	
+		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
+				0.f, OnAttackOverrideEndDelegate);
+	
+		UE_LOG(LogTemp, Warning, TEXT("Bee Attack!"));
+	
+		GetWorldTimerManager().SetTimer(AttackCooldownTimer, this, &AFlyEnemy::OnAttackCooldownTimerTimeout,
+				1.f, false, AttackCooldownInSeconds);
+	}
+}
+
+void AFlyEnemy::OnAttackCooldownTimerTimeout()
+{
+	CanAttack = true;
+}
+
+void AFlyEnemy::OnAttackOverrideAnimEnd(bool Completed)
+{
+	CanMove = true;
+}
+
+void AFlyEnemy::EnableAttackCollisionBox(bool Enabled)
+{
+	if (Enabled)
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	}
+	else
+	{
+		AttackCollisionBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		AttackCollisionBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	}
+}
+
+void AFlyEnemy::TakeDamage(int DamageAmount)
+{
+	if (!IsAlive) return;
+	
+	HP -= DamageAmount;
+
+	// if (HP <= 0)
+	// {
+	// 	Die();
+	// }
+	
+	UE_LOG(LogTemp, Warning, TEXT("Bee HP: %d"), HP);
+}
+
+void AFlyEnemy::SetHP(int NewHP)
+{
+	Super::SetHP(NewHP);
+}
+
+int AFlyEnemy::GetHP()
+{
+	return Super::GetHP();
 }

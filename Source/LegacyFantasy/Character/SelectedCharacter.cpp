@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Components/BoxComponent.h"
 #include "LegacyFantasy/Enemy/Enemy.h"
+#include "LegacyFantasy/Enemy/FlyEnemy.h"
 #include "LegacyFantasy/Enemy/WalkEnemy.h"
 
 
@@ -157,12 +158,14 @@ void ASelectedCharacter::EnableAttackCollisionBox(bool Enabled)
 void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
 {
-	AWalkEnemy* Enemy = Cast<AWalkEnemy>(OtherActor);
-
-	if (Enemy)
+	if (AWalkEnemy* Enemy = Cast<AWalkEnemy>(OtherActor))
 	{
 		Enemy->TakeDamage(DamageAttack);
 	}
+	if (AFlyEnemy* Enemy = Cast<AFlyEnemy>(OtherActor))
+    {
+    	Enemy->TakeDamage(DamageAttack);
+    }
 }
 
 void ASelectedCharacter::TakeDamage(int DamageAmount)

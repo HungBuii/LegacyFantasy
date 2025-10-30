@@ -128,11 +128,11 @@ protected:
 	/* HP */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	int HP = 100;
-//
-// 	void SetHP(int NewHP);
-// 	
-// public:
-// 	int GetHP();
+
+	virtual void SetHP(int NewHP);
+	
+public:
+	virtual int GetHP();
 
 private:
 
