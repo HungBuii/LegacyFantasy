@@ -39,40 +39,42 @@ void AFlyEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (FollowTarget && FollowTarget->GetStatusCharacter())
+	if (IsAlive)
 	{
-		MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
-		UpdateDirection(MoveDirection);
-
-		FVector DirectionToCharacter  = FollowTarget->GetActorLocation() - GetActorLocation();
-		if (ShouldMoveToTarget(DirectionToCharacter))
+		if (FollowTarget && FollowTarget->GetStatusCharacter())
 		{
-			DirectionToCharacter.Normalize();
-			FVector NewLocation = GetActorLocation() + (DirectionToCharacter * MoveSpeed * DeltaTime);
-			SetActorLocation(NewLocation);
+			MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
+			UpdateDirection(MoveDirection);
+
+			FVector DirectionToCharacter  = FollowTarget->GetActorLocation() - GetActorLocation();
+			if (ShouldMoveToTarget(DirectionToCharacter))
+			{
+				DirectionToCharacter.Normalize();
+				FVector NewLocation = GetActorLocation() + (DirectionToCharacter * MoveSpeed * DeltaTime);
+				SetActorLocation(NewLocation);
+			}
+			else
+			{
+				// Attack
+				Attack();
+			}
 		}
 		else
 		{
-			// Attack
-			Attack();
-		}
-	}
-	else
-	{
-		if (CanMove)
-		{
-			// FVector WorldDirection = FVector(1.f, 0.f, 0.f);
-			// AddMovementInput(WorldDirection, MoveDirection);
-			// EnemyMovement->MaxFlySpeed = MoveSpeed;
-			// UpdateDirection(MoveDirection);
+			if (CanMove)
+			{
+				// FVector WorldDirection = FVector(1.f, 0.f, 0.f);
+				// AddMovementInput(WorldDirection, MoveDirection);
+				// EnemyMovement->MaxFlySpeed = MoveSpeed;
+				// UpdateDirection(MoveDirection);
 
-			UpdateDirection(MoveDirection);
-			FVector NewLocation = GetActorLocation();
-			NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * DeltaTime);
-			SetActorLocation(NewLocation);
+				UpdateDirection(MoveDirection);
+				FVector NewLocation = GetActorLocation();
+				NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * DeltaTime);
+				SetActorLocation(NewLocation);
+			}
 		}
 	}
-	
 }
 
 void AFlyEnemy::PlatformDetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -227,6 +229,7 @@ void AFlyEnemy::Die()
 	FollowTarget = NULL;
 		
 	EnableAttackCollisionBox(false);
+	UE_LOG(LogTemp, Warning, TEXT("Bee Died"));
 }
 
 void AFlyEnemy::Stun()
