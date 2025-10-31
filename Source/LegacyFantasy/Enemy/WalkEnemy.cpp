@@ -225,7 +225,9 @@ void AWalkEnemy::EnableAttackCollisionBox(bool Enabled)
 void AWalkEnemy::TakeDamage(int DamageAmount)
 {
 	if (!IsAlive) return;
-	
+
+	Stun();
+	UE_LOG(LogTemp, Warning, TEXT("Boar Stun"));
 	HP -= DamageAmount;
 
 	if (HP <= 0)
@@ -261,4 +263,24 @@ void AWalkEnemy::Die()
 	GetAnimInstance()->JumpToNode(FName("JumpDie"), FName("Brown Boar State Machine"));
 		
 	EnableAttackCollisionBox(false);
+}
+
+void AWalkEnemy::Stun()
+{
+	IsStunned = true;
+
+	bool IsTimerAlreadyActive = GetWorldTimerManager().IsTimerActive(StunTimer);
+	if (IsTimerAlreadyActive) GetWorldTimerManager().ClearTimer(StunTimer);
+	
+	GetWorldTimerManager().SetTimer(StunTimer, this, &AWalkEnemy::OnStunTimerTimeout,
+		1.f, false, StunCooldownInSeconds);
+
+	GetAnimInstance()->StopAllAnimationOverrides();
+
+	EnableAttackCollisionBox(false);
+}
+
+void AWalkEnemy::OnStunTimerTimeout()
+{
+	IsStunned = false;
 }

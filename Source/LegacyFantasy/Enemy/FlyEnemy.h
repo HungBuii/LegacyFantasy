@@ -119,4 +119,16 @@ private:
 
 	/* Die */
 	void Die();
+
+	/* Stun */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	int StunCooldownInSeconds = 1;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool IsStunned = false;
+
+	struct FTimerHandle StunTimer;
+
+	void Stun();
+	void OnStunTimerTimeout();
 };

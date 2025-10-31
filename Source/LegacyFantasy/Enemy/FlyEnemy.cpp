@@ -189,7 +189,9 @@ void AFlyEnemy::EnableAttackCollisionBox(bool Enabled)
 void AFlyEnemy::TakeDamage(int DamageAmount)
 {
 	if (!IsAlive) return;
-	
+
+	Stun();
+	UE_LOG(LogTemp, Warning, TEXT("Bee Stun"));
 	HP -= DamageAmount;
 
 	if (HP <= 0)
@@ -225,4 +227,24 @@ void AFlyEnemy::Die()
 	FollowTarget = NULL;
 		
 	EnableAttackCollisionBox(false);
+}
+
+void AFlyEnemy::Stun()
+{
+	IsStunned = true;
+
+	bool IsTimerAlreadyActive = GetWorldTimerManager().IsTimerActive(StunTimer);
+	if (IsTimerAlreadyActive) GetWorldTimerManager().ClearTimer(StunTimer);
+	
+	GetWorldTimerManager().SetTimer(StunTimer, this, &AFlyEnemy::OnStunTimerTimeout,
+		1.f, false, StunCooldownInSeconds);
+
+	GetAnimInstance()->StopAllAnimationOverrides();
+
+	EnableAttackCollisionBox(false);
+}
+
+void AFlyEnemy::OnStunTimerTimeout()
+{
+	IsStunned = false;
 }
