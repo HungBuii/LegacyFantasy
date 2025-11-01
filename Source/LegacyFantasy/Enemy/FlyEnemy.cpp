@@ -45,10 +45,10 @@ void AFlyEnemy::Tick(float DeltaTime)
 		{
 			MoveDirection = (FollowTarget->GetActorLocation().X - GetActorLocation().X) > 0.f ? 1.f : -1.f;
 			UpdateDirection(MoveDirection);
-
-			FVector DirectionToCharacter  = FollowTarget->GetActorLocation() - GetActorLocation();
-			if (ShouldMoveToTarget(DirectionToCharacter))
+			
+			if (ShouldMoveToTarget())
 			{
+				FVector DirectionToCharacter  = FollowTarget->GetActorLocation() - GetActorLocation();
 				DirectionToCharacter.Normalize();
 				FVector NewLocation = GetActorLocation() + (DirectionToCharacter * MoveSpeed * DeltaTime);
 				SetActorLocation(NewLocation);
@@ -84,10 +84,11 @@ void AFlyEnemy::PlatformDetectorOverlapBegin(UPrimitiveComponent* OverlappedComp
 	UpdateDirection(MoveDirection);
 }
 
-bool AFlyEnemy::ShouldMoveToTarget(const FVector& DirectionToCharacter)
+bool AFlyEnemy::ShouldMoveToTarget()
 {
 	if (FollowTarget)
 	{
+		FVector DirectionToCharacter = FollowTarget->GetActorLocation() - GetActorLocation();
 		float DistanceToCharacter = abs(DirectionToCharacter.Length());
 		return (DistanceToCharacter > StopDistanceToTarget);
 	}
@@ -143,7 +144,7 @@ void AFlyEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	
 	if (Character && Character->GetStatusCharacter())
 	{
-		// Character->TakeDamage(DamageAttack);
+		Character->TakeDamage(DamageAttack);
 	}
 }
 

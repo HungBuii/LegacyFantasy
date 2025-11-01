@@ -73,7 +73,7 @@ void AWalkEnemy::EnemyAction()
 		}
 		else
 		{
-			if (CanWalk)
+			if (CanMove)
 			{
 				FVector WorldDirection = FVector(1.f, 0.f, 0.f);
 				AddMovementInput(WorldDirection, MoveDirection);
@@ -183,7 +183,7 @@ void AWalkEnemy::Attack()
 {
 	if (CanAttack)
 	{
-		CanWalk = false;
+		CanMove = false;
 		CanAttack = false;
 	
 		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
@@ -205,7 +205,7 @@ void AWalkEnemy::OnAttackCooldownTimerTimeout()
 
 void AWalkEnemy::OnAttackOverrideAnimEnd(bool Completed)
 {
-	CanWalk = true;
+	CanMove = true;
 }
 
 void AWalkEnemy::EnableAttackCollisionBox(bool Enabled)
@@ -253,7 +253,7 @@ void AWalkEnemy::Die()
 	SetHP(0);
 	
 	IsAlive = false;
-	CanWalk = false;
+	CanMove = false;
 	CanRun = false;
 	CanAttack = false;
 

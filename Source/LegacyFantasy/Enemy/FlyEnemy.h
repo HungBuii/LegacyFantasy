@@ -36,16 +36,7 @@ private:
 	UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult);
 
 	/* Find Character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	class USphereComponent* CharacterDetectorSphere;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	class ASelectedCharacter* FollowTarget;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	float StopDistanceToTarget = 70.f;
-	
-	bool ShouldMoveToTarget(const FVector& DirectionToCharacter);
+	bool ShouldMoveToTarget() override;
 
 	UFUNCTION()
 	void DetectorOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -58,39 +49,16 @@ private:
 	/* Direction */
 	void UpdateDirection(float MDirection);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
-	float MoveDirection = -1.f;
-
 	/* Movement */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	class UCharacterMovementComponent* EnemyMovement;
 	
 	/* Move */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	float MoveSpeed = 100.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool CanMove = true;
 	
 	/* Attack */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	class UBoxComponent* AttackCollisionBox;
-    	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
-	const UPaperZDAnimSequence* AttackAnimSequence;
-    
 	struct FTimerHandle AttackCooldownTimer;
     	
 	FZDOnAnimationOverrideEndSignature OnAttackOverrideEndDelegate;
-    	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	float AttackCooldownInSeconds = 2.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool CanAttack = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int DamageAttack = 10;
 
 	UFUNCTION()
 	void AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -99,36 +67,29 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void EnableAttackCollisionBox(bool Enabled);
 	
-	void Attack();
-	void OnAttackCooldownTimerTimeout();
-	void OnAttackOverrideAnimEnd(bool Completed);
+	virtual void Attack() override;
+	virtual void OnAttackCooldownTimerTimeout() override;
+	virtual void OnAttackOverrideAnimEnd(bool Completed) override;
 
 public:
 	/* Take damage */
 	virtual void TakeDamage(int DamageAmount) override;
 
 protected:
-	void SetHP(int NewHP) override;
+	virtual void SetHP(int NewHP) override;
 	
 public:
-	int GetHP() override;
+	virtual int GetHP() override;
 
 private:
 	/* Status */
-	bool IsAlive = true;
 
 	/* Die */
-	void Die();
+	virtual void Die() override;
 
 	/* Stun */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int StunCooldownInSeconds = 1;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	bool IsStunned = false;
-
 	struct FTimerHandle StunTimer;
 
-	void Stun();
-	void OnStunTimerTimeout();
+	virtual void Stun() override;
+	virtual void OnStunTimerTimeout() override;
 };
