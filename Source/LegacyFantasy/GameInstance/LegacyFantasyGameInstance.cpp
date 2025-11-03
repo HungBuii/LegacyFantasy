@@ -21,7 +21,7 @@ void ULegacyFantasyGameInstance::ChangeLevel(int LevelIndex)
 
 	CurrentLevelIndex = LevelIndex;
 
-	FString LevelNameString = FString::Printf(TEXT("LEVEL:%d"), CurrentLevelIndex);
+	FString LevelNameString = FString::Printf(TEXT("Level_%d"), CurrentLevelIndex);
 	UGameplayStatics::OpenLevel(GetWorld(), FName(LevelNameString));
 }
 

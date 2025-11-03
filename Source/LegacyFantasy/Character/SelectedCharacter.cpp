@@ -231,10 +231,18 @@ void ASelectedCharacter::Die()
 	GetAnimInstance()->JumpToNode(FName("JumpDie"), FName("Character State Machine"));
 
 	EnableAttackCollisionBox(false);
+
+	GetWorldTimerManager().SetTimer(RestartTimer, this, &ASelectedCharacter::OnRestartTimerTimeout,
+		1.f, false, RestartDelay);
 }
 
 bool ASelectedCharacter::GetStatusCharacter()
 {
 	return IsAlive;
+}
+
+void ASelectedCharacter::OnRestartTimerTimeout()
+{
+	ThisGameInstance->RestartGame();
 }
 

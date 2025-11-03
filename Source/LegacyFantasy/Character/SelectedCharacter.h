@@ -125,6 +125,14 @@ public:
 private:
 	/* Die */
 	void Die();
+	
+	/* Restart Game */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float RestartDelay = 3.f;
+	
+	struct FTimerHandle RestartTimer;
+
+	void OnRestartTimerTimeout();
 
 	/* HUD */
 	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess))
