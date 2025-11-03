@@ -13,6 +13,7 @@
 #include "LegacyFantasy/Enemy/Enemy.h"
 #include "LegacyFantasy/Enemy/FlyEnemy.h"
 #include "LegacyFantasy/Enemy/WalkEnemy.h"
+#include "LegacyFantasy/GameInstance/LegacyFantasyGameInstance.h"
 
 
 ASelectedCharacter::ASelectedCharacter()
@@ -50,6 +51,12 @@ void ASelectedCharacter::BeginPlay()
 	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ASelectedCharacter::AttackBoxOverlapBegin);
 	EnableAttackCollisionBox(false);
 
+	ThisGameInstance = Cast<ULegacyFantasyGameInstance>(GetGameInstance());
+	if (ThisGameInstance)
+	{
+		HP = ThisGameInstance->GetCharacterHP();
+	}
+	
 	if (CharacterHUDClass)
 	{
 		CharacterHUDWidget = CreateWidget<UCharacterHUD>(
@@ -203,6 +210,7 @@ void ASelectedCharacter::TakeDamage(int DamageAmount)
 void ASelectedCharacter::SetHP(int NewHP)
 {
 	HP = NewHP;
+	ThisGameInstance->SetCharacterHP(HP);
 	CharacterHUDWidget->SetHP(HP);
 }
 

@@ -132,4 +132,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, meta=(AllowPrivateAccess))
 	class UCharacterHUD* CharacterHUDWidget;
+
+	/* GameInstance */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	class ULegacyFantasyGameInstance* ThisGameInstance;
 };
