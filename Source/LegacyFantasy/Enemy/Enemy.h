@@ -99,10 +99,22 @@ public:
 	virtual int GetHP();
 
 protected:
-
 	/* Status */
 	bool IsAlive = true;
+
+public:
+	virtual bool GetStatus();
+
+protected:
+	/* Disable Action */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	bool IsActiveAction = true;
 	
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void Deactivate();
+
+protected:
 	/* Die */
 	virtual void Die();
 

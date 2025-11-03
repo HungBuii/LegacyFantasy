@@ -5,7 +5,9 @@
 
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LegacyFantasy/Character/SelectedCharacter.h"
+#include "LegacyFantasy/Enemy/Enemy.h"
 #include "LegacyFantasy/GameInstance/LegacyFantasyGameInstance.h"
 
 // Sets default values
@@ -49,6 +51,17 @@ void ADoorExit::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 		if (IsActive)
 		{
 			Character->Deactivate();
+
+			TArray<AActor*> Enemies;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), Enemies);
+			for (AActor* EnemyActor : Enemies)
+			{
+				AEnemy* Enemy = Cast<AEnemy>(EnemyActor);
+				if (Enemy && Enemy->GetStatus())
+				{
+					Enemy->Deactivate();
+				}
+			}
 			
 			IsActive = false;
 

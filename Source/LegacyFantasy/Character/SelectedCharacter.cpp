@@ -171,11 +171,16 @@ void ASelectedCharacter::EnableAttackCollisionBox(bool Enabled)
 void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool FromSweep, const FHitResult& SweepResult)
 {
-	if (AWalkEnemy* Enemy = Cast<AWalkEnemy>(OtherActor))
-	{
-		Enemy->TakeDamage(DamageAttack);
-	}
-	if (AFlyEnemy* Enemy = Cast<AFlyEnemy>(OtherActor))
+	// if (AWalkEnemy* Enemy = Cast<AWalkEnemy>(OtherActor))
+	// {
+	// 	Enemy->TakeDamage(DamageAttack);
+	// }
+	// if (AFlyEnemy* Enemy = Cast<AFlyEnemy>(OtherActor))
+	// {
+	// 	Enemy->TakeDamage(DamageAttack);
+	// }
+	
+	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
 	{
 		Enemy->TakeDamage(DamageAttack);
 	}

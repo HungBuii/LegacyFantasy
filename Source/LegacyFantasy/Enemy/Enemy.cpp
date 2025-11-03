@@ -76,6 +76,24 @@ int AEnemy::GetHP()
 	return HP;
 }
 
+bool AEnemy::GetStatus()
+{
+	return IsAlive;
+}
+
+void AEnemy::Deactivate()
+{
+	if (IsActiveAction)
+	{
+		IsActiveAction = false;
+		CanAttack = false;
+		CanMove = false;
+		FollowTarget = NULL;
+		
+		GetCharacterMovement()->StopMovementImmediately();
+	}
+}
+
 void AEnemy::Die()
 {
 	

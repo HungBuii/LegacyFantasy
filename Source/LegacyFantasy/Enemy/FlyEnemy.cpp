@@ -223,6 +223,16 @@ int AFlyEnemy::GetHP()
 	return Super::GetHP();
 }
 
+bool AFlyEnemy::GetStatus()
+{
+	return Super::GetStatus();
+}
+
+void AFlyEnemy::Deactivate()
+{
+	Super::Deactivate();
+}
+
 void AFlyEnemy::Die()
 {
 	SetHP(0);

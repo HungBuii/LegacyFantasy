@@ -80,10 +80,13 @@ protected:
 	
 public:
 	virtual int GetHP() override;
-
-private:
+	
 	/* Status */
+	virtual bool GetStatus() override;
 
+	/* Disable Action */
+	virtual void Deactivate() override;
+	
 	/* Die */
 	virtual void Die() override;
 

@@ -94,10 +94,14 @@ protected:
 	
 public:
 	virtual int GetHP() override;
+	
+	/* Status */
+	virtual bool GetStatus() override;
+	
+	/* Disable Action */
+	virtual void Deactivate() override;
 
 private:
-	/* Status */
-	
 	/* Die */
 	virtual void Die() override;
 

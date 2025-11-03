@@ -248,6 +248,16 @@ int AWalkEnemy::GetHP()
 	return Super::GetHP();
 }
 
+bool AWalkEnemy::GetStatus()
+{
+	return Super::GetStatus();
+}
+
+void AWalkEnemy::Deactivate()
+{
+	Super::Deactivate();
+}
+
 void AWalkEnemy::Die()
 {
 	SetHP(0);
