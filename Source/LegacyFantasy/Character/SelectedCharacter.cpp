@@ -101,7 +101,7 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 {
 	float MoveActionValue = Value.Get<float>();
 
-	if (CanMove && IsAlive)
+	if (CanMove && IsAlive && !IsStunned)
 	{
 		FVector WorldDirection = FVector(1.f, 0, 0);
 		AddMovementInput(WorldDirection, MoveActionValue);
@@ -142,7 +142,7 @@ void ASelectedCharacter::JumpEnded(const FInputActionValue& Value)
 
 void ASelectedCharacter::Attack(const FInputActionValue& Value)
 {
-	if (CanAttack && IsAlive)
+	if (CanAttack && IsAlive && !IsStunned)
 	{
 		CanAttack = false;
 		CanMove = false;
@@ -196,6 +196,8 @@ void ASelectedCharacter::TakeDamage(int DamageAmount)
 {
 	if (!IsAlive) return;
 
+	Stun();
+	UE_LOG(LogTemp, Warning, TEXT("Character Stun"));
 	HP -= DamageAmount;
 	SetHP(HP);
 	
@@ -217,6 +219,26 @@ void ASelectedCharacter::SetHP(int NewHP)
 int ASelectedCharacter::GetHP()
 {
 	return HP;
+}
+
+void ASelectedCharacter::Stun()
+{
+	IsStunned = true;
+
+	bool IsTimerAlreadyActive = GetWorldTimerManager().IsTimerActive(StunTimer);
+	if (IsTimerAlreadyActive) GetWorldTimerManager().ClearTimer(StunTimer);
+	
+	GetWorldTimerManager().SetTimer(StunTimer, this, &ASelectedCharacter::OnStunTimerTimeout,
+		1.f, false, StunDuration);
+
+	GetAnimInstance()->StopAllAnimationOverrides();
+
+	EnableAttackCollisionBox(false);
+}
+
+void ASelectedCharacter::OnStunTimerTimeout()
+{
+	IsStunned = false;
 }
 
 void ASelectedCharacter::Die()

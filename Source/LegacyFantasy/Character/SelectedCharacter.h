@@ -123,6 +123,18 @@ public:
 	bool GetStatusCharacter();	
 
 private:
+	/* Stun */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	bool IsStunned = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	float StunDuration = 0.5f;
+	
+    struct FTimerHandle StunTimer;
+    
+	void Stun();
+	void OnStunTimerTimeout();
+	
 	/* Die */
 	void Die();
 	

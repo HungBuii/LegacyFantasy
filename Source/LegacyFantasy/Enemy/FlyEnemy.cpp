@@ -154,7 +154,7 @@ void AFlyEnemy::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 
 void AFlyEnemy::Attack()
 {
-	if (CanAttack)
+	if (CanAttack && !IsStunned)
 	{
 		CanMove = false;
 		CanAttack = false;

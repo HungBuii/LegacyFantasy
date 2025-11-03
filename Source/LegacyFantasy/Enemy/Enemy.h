@@ -108,7 +108,7 @@ protected:
 
 	/* Stun */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
-	int StunCooldownInSeconds = 1;
+	float StunCooldownInSeconds = 1.5f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	bool IsStunned = false;
