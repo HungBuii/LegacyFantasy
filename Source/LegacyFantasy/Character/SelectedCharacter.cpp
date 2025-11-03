@@ -38,7 +38,7 @@ void ASelectedCharacter::BeginPlay()
 	if (CharacterController)
 	{
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>
-														(CharacterController->GetLocalPlayer());
+			(CharacterController->GetLocalPlayer());
 
 		if (Subsystem)
 		{
@@ -110,26 +110,6 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 	
 }
 
-void ASelectedCharacter::UpdateDirection(float MoveDirection)
-{
-	FRotator CurrentRotation = Controller->GetControlRotation();
-
-	if (MoveDirection < 0.f)
-	{
-		if (CurrentRotation.Yaw != 180.f)
-		{
-			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 180.f, CurrentRotation.Roll));
-		}
-	}
-	else if (MoveDirection > 0.f)
-	{
-		if (CurrentRotation.Yaw != 0.f)
-		{
-			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 0.f, CurrentRotation.Roll));
-		}
-	}
-}
-
 void ASelectedCharacter::JumpStarted(const FInputActionValue& Value)
 {
 	Jump();
@@ -140,6 +120,11 @@ void ASelectedCharacter::JumpEnded(const FInputActionValue& Value)
 	StopJumping();
 }
 
+void ASelectedCharacter::UnlockDoubleJump()
+{
+	JumpMaxCount = 2;
+}
+
 void ASelectedCharacter::Attack(const FInputActionValue& Value)
 {
 	if (CanAttack && IsAlive && !IsStunned)
@@ -148,16 +133,11 @@ void ASelectedCharacter::Attack(const FInputActionValue& Value)
 		CanMove = false;
 		
 		GetAnimInstance()->PlayAnimationOverride(AttackAnimSequence, FName("AttackSlot"), 1.f,
-				0.f, OnAttackOverrideEndDelegate);
+		                                         0.f, OnAttackOverrideEndDelegate);
 
 		GetWorldTimerManager().SetTimer(AttackCooldownTimer, this,
-			&ASelectedCharacter::OnAttackCooldownTimerTimeout, 1.f, false, AttackCooldownInSeconds);
+		                                &ASelectedCharacter::OnAttackCooldownTimerTimeout, 1.f, false, AttackCooldownInSeconds);
 	}
-}
-
-void ASelectedCharacter::OnAttackCooldownTimerTimeout()
-{
-	CanAttack = true;
 }
 
 void ASelectedCharacter::OnAttackOverrideAnimEnd(bool Completed)
@@ -187,9 +167,34 @@ void ASelectedCharacter::AttackBoxOverlapBegin(UPrimitiveComponent* OverlappedCo
 		Enemy->TakeDamage(DamageAttack);
 	}
 	if (AFlyEnemy* Enemy = Cast<AFlyEnemy>(OtherActor))
-    {
-    	Enemy->TakeDamage(DamageAttack);
-    }
+	{
+		Enemy->TakeDamage(DamageAttack);
+	}
+}
+
+void ASelectedCharacter::OnAttackCooldownTimerTimeout()
+{
+	CanAttack = true;
+}
+
+void ASelectedCharacter::UpdateDirection(float MoveDirection)
+{
+	FRotator CurrentRotation = Controller->GetControlRotation();
+
+	if (MoveDirection < 0.f)
+	{
+		if (CurrentRotation.Yaw != 180.f)
+		{
+			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 180.f, CurrentRotation.Roll));
+		}
+	}
+	else if (MoveDirection > 0.f)
+	{
+		if (CurrentRotation.Yaw != 0.f)
+		{
+			Controller->SetControlRotation(FRotator(CurrentRotation.Pitch, 0.f, CurrentRotation.Roll));
+		}
+	}
 }
 
 void ASelectedCharacter::TakeDamage(int DamageAmount)
@@ -221,6 +226,32 @@ int ASelectedCharacter::GetHP()
 	return HP;
 }
 
+bool ASelectedCharacter::GetStatusCharacter()
+{
+	return IsAlive;
+}
+
+void ASelectedCharacter::CollectItem(ItemType ItemType)
+{
+	switch (ItemType)
+	{
+	case ItemType::HealthPotion:
+		{
+			int healAmount = 15;
+			SetHP(HP + healAmount);
+		} break;
+
+	case ItemType::DoubleJumpUpgrade:
+		{
+			UnlockDoubleJump();
+		} break;
+
+	default:
+		{
+		} break;
+	}
+}
+
 void ASelectedCharacter::Stun()
 {
 	IsStunned = true;
@@ -229,7 +260,7 @@ void ASelectedCharacter::Stun()
 	if (IsTimerAlreadyActive) GetWorldTimerManager().ClearTimer(StunTimer);
 	
 	GetWorldTimerManager().SetTimer(StunTimer, this, &ASelectedCharacter::OnStunTimerTimeout,
-		1.f, false, StunDuration);
+	                                1.f, false, StunDuration);
 
 	GetAnimInstance()->StopAllAnimationOverrides();
 
@@ -255,12 +286,7 @@ void ASelectedCharacter::Die()
 	EnableAttackCollisionBox(false);
 
 	GetWorldTimerManager().SetTimer(RestartTimer, this, &ASelectedCharacter::OnRestartTimerTimeout,
-		1.f, false, RestartDelay);
-}
-
-bool ASelectedCharacter::GetStatusCharacter()
-{
-	return IsAlive;
+	                                1.f, false, RestartDelay);
 }
 
 void ASelectedCharacter::OnRestartTimerTimeout()

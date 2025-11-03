@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperZDAnimInstance.h"
 #include "PaperZDCharacter.h"
+#include "LegacyFantasy/Items/Items.h"
 #include "SelectedCharacter.generated.h"
 
 
@@ -65,6 +66,8 @@ private:
 	void JumpStarted(const FInputActionValue& Value);
 	void JumpEnded(const FInputActionValue& Value);
 	
+	void UnlockDoubleJump();
+	
 	/* Attack */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	class UBoxComponent* AttackCollisionBox;
@@ -122,6 +125,10 @@ private:
 public:
 	bool GetStatusCharacter();	
 
+public:
+	/* Items */
+	void CollectItem(ItemType ItemType);
+	
 private:
 	/* Stun */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
