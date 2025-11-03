@@ -3,11 +3,13 @@
 
 #include "SelectedCharacter.h"
 
+#include "CharacterHUD.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LegacyFantasy/Enemy/Enemy.h"
 #include "LegacyFantasy/Enemy/FlyEnemy.h"
 #include "LegacyFantasy/Enemy/WalkEnemy.h"
@@ -47,6 +49,21 @@ void ASelectedCharacter::BeginPlay()
 
 	AttackCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &ASelectedCharacter::AttackBoxOverlapBegin);
 	EnableAttackCollisionBox(false);
+
+	if (CharacterHUDClass)
+	{
+		CharacterHUDWidget = CreateWidget<UCharacterHUD>(
+			UGameplayStatics::GetPlayerController(GetWorld(), 0),
+			CharacterHUDClass);
+
+		if (CharacterHUDWidget)
+		{
+			CharacterHUDWidget->AddToPlayerScreen();
+			
+			CharacterHUDWidget->SetHP(HP);
+			CharacterHUDWidget->SetLevel(1);
+		}
+	}
 }
 
 void ASelectedCharacter::Tick(float DeltaTime)
@@ -173,6 +190,8 @@ void ASelectedCharacter::TakeDamage(int DamageAmount)
 	if (!IsAlive) return;
 
 	HP -= DamageAmount;
+	SetHP(HP);
+	
 	if (HP <= 0)
 	{
 		Die();
@@ -184,6 +203,7 @@ void ASelectedCharacter::TakeDamage(int DamageAmount)
 void ASelectedCharacter::SetHP(int NewHP)
 {
 	HP = NewHP;
+	CharacterHUDWidget->SetHP(HP);
 }
 
 int ASelectedCharacter::GetHP()

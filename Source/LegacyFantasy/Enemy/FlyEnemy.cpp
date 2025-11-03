@@ -5,6 +5,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "LegacyFantasy/Character/SelectedCharacter.h"
 
 AFlyEnemy::AFlyEnemy()
@@ -38,7 +39,10 @@ void AFlyEnemy::BeginPlay()
 void AFlyEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void AFlyEnemy::EnemyAction()
+{
 	if (IsAlive)
 	{
 		if (FollowTarget && FollowTarget->GetStatusCharacter())
@@ -50,7 +54,7 @@ void AFlyEnemy::Tick(float DeltaTime)
 			{
 				FVector DirectionToCharacter  = FollowTarget->GetActorLocation() - GetActorLocation();
 				DirectionToCharacter.Normalize();
-				FVector NewLocation = GetActorLocation() + (DirectionToCharacter * MoveSpeed * DeltaTime);
+				FVector NewLocation = GetActorLocation() + (DirectionToCharacter * MoveSpeed * UGameplayStatics::GetWorldDeltaSeconds(this));
 				SetActorLocation(NewLocation);
 			}
 			else
@@ -70,7 +74,7 @@ void AFlyEnemy::Tick(float DeltaTime)
 
 				UpdateDirection(MoveDirection);
 				FVector NewLocation = GetActorLocation();
-				NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * DeltaTime);
+				NewLocation.X = GetActorLocation().X + (MoveDirection * MoveSpeed * UGameplayStatics::GetWorldDeltaSeconds(this));
 				SetActorLocation(NewLocation);
 			}
 		}

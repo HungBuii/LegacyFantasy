@@ -125,5 +125,11 @@ public:
 private:
 	/* Die */
 	void Die();
-	
+
+	/* HUD */
+	UPROPERTY(EditAnywhere, meta=(AllowPrivateAccess))
+	TSubclassOf<class UCharacterHUD> CharacterHUDClass;
+
+	UPROPERTY(VisibleAnywhere, meta=(AllowPrivateAccess))
+	class UCharacterHUD* CharacterHUDWidget;
 };

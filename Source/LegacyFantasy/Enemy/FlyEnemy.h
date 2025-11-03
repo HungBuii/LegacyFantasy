@@ -92,4 +92,11 @@ private:
 
 	virtual void Stun() override;
 	virtual void OnStunTimerTimeout() override;
+
+	/* Event, function callback */
+	UPROPERTY(BlueprintAssignable)
+	FEnemyActionDelegate EnemyActionDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void EnemyAction();
 };
