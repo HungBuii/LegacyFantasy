@@ -63,6 +63,9 @@ private:
 	void Move(const FInputActionValue& Value);
 
 	/* Jump */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool CanJumping = true;
+	
 	void JumpStarted(const FInputActionValue& Value);
 	void JumpEnded(const FInputActionValue& Value);
 	
@@ -144,6 +147,16 @@ private:
 	
 	/* Die */
 	void Die();
+
+	/* Disable Action */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	bool IsActiveAction = true;
+	
+public:
+	UFUNCTION(BlueprintCallable)
+	void Deactivate();
+
+private:
 	
 	/* Restart Game */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))

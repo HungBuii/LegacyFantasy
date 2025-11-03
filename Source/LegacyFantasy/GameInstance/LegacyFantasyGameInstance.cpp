@@ -25,9 +25,20 @@ void ULegacyFantasyGameInstance::ChangeLevel(int LevelIndex)
 	UGameplayStatics::OpenLevel(GetWorld(), FName(LevelNameString));
 }
 
+void ULegacyFantasyGameInstance::SetDoubleJumpUnlocked(bool Status)
+{
+	IsDoubleJumpUnlocked = Status;
+}
+
+bool ULegacyFantasyGameInstance::GetDoubleJumpUnlocked()
+{
+	return IsDoubleJumpUnlocked;
+}
+
 void ULegacyFantasyGameInstance::RestartGame()
 {
 	CharacterHP = 100;
 	CurrentLevelIndex = 1;
+	IsDoubleJumpUnlocked = false;
 	ChangeLevel(CurrentLevelIndex);
 }

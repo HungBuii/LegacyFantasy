@@ -21,6 +21,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
 	int CurrentLevelIndex = 1;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(AllowPrivateAccess))
+	bool IsDoubleJumpUnlocked = false;
+
 public:
 	int GetCharacterHP();
 	
@@ -28,6 +31,9 @@ public:
 
 	void ChangeLevel(int LevelIndex);
 
+	void SetDoubleJumpUnlocked(bool Status);
+	bool GetDoubleJumpUnlocked();
+	
 	UFUNCTION(BlueprintCallable)
 	void RestartGame();
 };

@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "LegacyFantasy/Enemy/Enemy.h"
 #include "LegacyFantasy/Enemy/FlyEnemy.h"
@@ -55,6 +56,10 @@ void ASelectedCharacter::BeginPlay()
 	if (ThisGameInstance)
 	{
 		HP = ThisGameInstance->GetCharacterHP();
+		if (ThisGameInstance->GetDoubleJumpUnlocked())
+		{
+			UnlockDoubleJump();
+		}
 	}
 	
 	if (CharacterHUDClass)
@@ -112,7 +117,11 @@ void ASelectedCharacter::Move(const FInputActionValue& Value)
 
 void ASelectedCharacter::JumpStarted(const FInputActionValue& Value)
 {
-	Jump();
+	if (CanJumping)
+	{
+		Jump();
+	}
+	
 }
 
 void ASelectedCharacter::JumpEnded(const FInputActionValue& Value)
@@ -243,7 +252,11 @@ void ASelectedCharacter::CollectItem(ItemType ItemType)
 
 	case ItemType::DoubleJumpUpgrade:
 		{
-			UnlockDoubleJump();
+			if (!ThisGameInstance->GetDoubleJumpUnlocked())
+			{
+				ThisGameInstance->SetDoubleJumpUnlocked(true);
+				UnlockDoubleJump();
+			}
 		} break;
 
 	default:
@@ -279,6 +292,7 @@ void ASelectedCharacter::Die()
 	IsAlive = false;
 	CanMove = false;
 	CanAttack = false;
+	CanJumping = false;
 
 	// Play the die animation
 	GetAnimInstance()->JumpToNode(FName("JumpDie"), FName("Character State Machine"));
@@ -292,5 +306,18 @@ void ASelectedCharacter::Die()
 void ASelectedCharacter::OnRestartTimerTimeout()
 {
 	ThisGameInstance->RestartGame();
+}
+
+void ASelectedCharacter::Deactivate()
+{
+	if (IsActiveAction)
+	{
+		IsActiveAction = false;
+		CanAttack = false;
+		CanMove = false;
+		CanJumping = false;
+		
+		GetCharacterMovement()->StopMovementImmediately();
+	}
 }
 
