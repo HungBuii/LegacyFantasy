@@ -3,8 +3,6 @@
 
 #include "Enemy.h"
 
-#include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "LegacyFantasy/Character/SelectedCharacter.h"
 
